@@ -79,6 +79,9 @@ footer{margin-top:80px;padding-top:20px;border-top:1px solid var(--bd);color:var
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.g rect,.g line,.g polygon{stroke-dashoffset:0}.g .dot{opacity:1}}
 .n.done{border-left-color:var(--c,#fff)}.n.sel{outline-color:var(--c,#fff)}.dh .bar{min-width:220px}.bar i{background:var(--c,#fff)}
 .n:focus-visible,.btn:focus-visible,a:focus-visible,summary:focus-visible,.seg button:focus-visible,input:focus-visible{outline:1px solid var(--c,#fff);outline-offset:3px}
+.tk{display:flex;align-items:center;gap:16px;padding:20px 0;border-bottom:1px solid var(--bd);cursor:pointer}.tk span{flex:1}.tk b{display:block;font-weight:500}.tk em{font-style:normal;color:var(--mu);font-size:12px}.tk a{color:var(--mu);font-size:13px;transition:color .2s}.tk a:hover{color:var(--tx)}.tk input:checked+span b{text-decoration:line-through;color:var(--mu)}
+.hm{display:grid;grid-template-rows:repeat(7,14px);grid-auto-flow:column;grid-auto-columns:14px;gap:4px;overflow-x:auto;padding-bottom:4px}.hm i{border:1px solid var(--bd);background:#fff}.hm i.e{background:none}
+.bk{width:100%;min-height:110px;background:none;border:1px solid var(--bd);color:var(--tx);font:12px ui-monospace,monospace;padding:12px;resize:vertical}.bk:focus{outline:1px solid #666}
 </style></head><body>
 <header id="hd"></header><main id="m"></main>
 <script>
@@ -168,9 +171,9 @@ const WK=['W1-2: Excel core + stats; CAT baseline mock','W3-4: Mini project data
 const TK={cat:['CAT mock log',['Mock','Score','Percentile']],sales:['Sales practice log',['Activity (roleplay/cold call/pitch)','Minutes','Notes']],trade:['Trading dev log',['Stage / test','Result','Notes']],port:['Portfolio tracker',['Item','Link','Notes']]};
 const B={an:['Business Analytics','#7d9bbd'],au:['AI & Automation','#9a8fc0'],wb:['Web Development & Marketing','#bfa874'],sl:['Sales & Negotiation','#c08a8a'],tr:['Quantitative Finance & AI Trading','#78b096'],mb:['CAT, IIM & MBA Preparation','#c08fa8']};
 const K=Object.keys(B),NUM={};K.forEach(k=>N.filter(n=>n.b==k).forEach((n,i)=>NUM[n.id]=String(i+1).padStart(2,'0')));
-let S={},PS={},LG={},sel=null;
-try{const d=JSON.parse(localStorage.getItem('rm1')||'{}');S=d.S||{};PS=d.PS||{};LG=d.LG||{}}catch(e){}
-const fix=()=>{let c=1;while(c){c=0;N.forEach(n=>{if(S[n.id]&&lock(n)){S[n.id]='';c=1}})}};const sv=()=>{fix();try{localStorage.setItem('rm1',JSON.stringify({S,PS,LG}))}catch(e){}};
+let S={},PS={},LG={},CK={},sel=null;
+try{const d=JSON.parse(localStorage.getItem('rm1')||'{}');S=d.S||{};PS=d.PS||{};LG=d.LG||{};CK=d.CK||{}}catch(e){}
+const fix=()=>{let c=1;while(c){c=0;N.forEach(n=>{if(S[n.id]&&lock(n)){S[n.id]='';c=1}})}};const sv=()=>{fix();try{localStorage.setItem('rm1',JSON.stringify({S,PS,LG,CK}))}catch(e){}};
 const $=s=>document.querySelector(s),lock=n=>n.p.some(p=>S[p]!=='done'),dn=l=>l.filter(n=>S[n.id]==='done').length;
 const pct=l=>l.length?Math.round(100*dn(l)/l.length):0;
 const nxt=b=>N.filter(n=>(!b||n.b==b)&&S[n.id]!=='done'&&!lock(n)).sort((a,b)=>a.m-b.m);
@@ -181,12 +184,35 @@ const tg=id=>{if(lock(byId[id]))return;S[id]=S[id]==='done'?'':'done';sv();route
 const ss=(id,v)=>{if(lock(byId[id]))return;S[id]=S[id]===v?'':v;sv();route(1)};
 const pk=id=>{sel=id;route(1);document.getElementById('d-'+id).scrollIntoView({block:'center',behavior:'smooth'})};
 const tp=i=>{PS[i]=!PS[i];sv();route(1)};
+const td=(o=0)=>{const d=new Date();d.setDate(d.getDate()-o);return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const RK=[['E',0],['D',300],['C',800],['B',1600],['A',2800],['S',4500]];
+const rank=()=>{let x=0;N.forEach(n=>x+={done:100,prac:40,learn:15}[S[n.id]]||0);x+=Object.values(PS).filter(Boolean).length*250;Object.values(LG).forEach(l=>x+=l.length*30);Object.values(CK).forEach(a=>x+=a.length*20);let i=0;RK.forEach((r,j)=>{if(x>=r[1])i=j});return{x,r:RK[i][0],lo:RK[i][1],nx:RK[i+1]}};
+const streak=()=>{let c=0,o=(CK[td()]||[]).length?0:1;while((CK[td(o)]||[]).length){c++;o++}return c};
+const ck=k=>{const d=td(),a=CK[d]||[];CK[d]=a.includes(k)?a.filter(x=>x!=k):[...a,k];if(!CK[d].length)delete CK[d];sv();route(1)};
+const ex=()=>{window.imArm=0;const t=JSON.stringify({v:1,S,PS,LG,CK}),b=$('#bk'),m=$('#bkm');b.value=t;b.select();try{navigator.clipboard.writeText(t).then(()=>m.textContent='Copied to clipboard',()=>m.textContent='Select and copy the text above')}catch(e){m.textContent='Select and copy the text above'}};
+const im=()=>{let d;try{d=JSON.parse($('#bk').value)}catch(e){}const m=$('#bkm');if(!d||!d.S||typeof d.S!=='object'){m.textContent='Not a valid backup';return}
+if(!window.imArm){window.imArm=1;m.textContent='Press Import again to replace current progress';return}
+window.imArm=0;S=d.S;PS=d.PS||{};LG=d.LG||{};CK=d.CK||{};sv();route(1)};
+function today(m){const r=rank(),a=CK[td()]||[],p=r.nx?Math.round(100*(r.x-r.lo)/(r.nx[1]-r.lo)):100;
+const T=[['cat','CAT study','60 min',nxt('mb')[0]],['proj','Project and skill build','60 min',nxt('an')[0]||nxt()[0]],['sales','Sales practice','30 min',nxt('sl')[0]]];
+const hm=[...Array(84)].map((_,i)=>{const c=(CK[td(83-i)]||[]).length;return`<i class="${c?'':'e'}" style="opacity:${c?.3+.23*c:1}" title="${td(83-i)}"></i>`}).join('');
+m.innerHTML=`<div class="dh rv"><div><span class="eyebrow">Today · ${td()}</span><h2>Level up<br>one day at a time.</h2></div></div>
+<section class="stats rv" style="--i:1"><div><span class="k">Rank</span><b>${r.r}</b></div><div><span class="k">XP</span><b>${r.x}</b></div><div><span class="k">Streak</span><b>${streak()} ${streak()==1?'day':'days'}</b></div></section>
+<div style="max-width:420px;margin-top:20px"><div class="bar"><i style="width:${p}%"></i></div><p class="mu" style="margin:8px 0 0">${r.nx?`${r.nx[1]-r.x} XP to rank ${r.nx[0]}`:'Maximum rank reached'}</p></div>
+<div class="sec"><span class="k">Today's quests</span><span class="k">${a.length==3?'Day cleared':a.length+' / 3'}</span></div>
+${T.map(([k,t,mi,n])=>`<label class="tk"><input type="checkbox" ${a.includes(k)?'checked':''} onchange="ck('${k}')"><span><b>${t}</b><em>${mi} · +20 XP</em></span>${n?`<a href="#${n.b}" onclick="sel='${n.id}'">${n.n} →</a>`:''}</label>`).join('')}
+<div class="sec"><span class="k">Last 12 weeks</span><span class="k">Days with quests done</span></div><div class="hm">${hm}</div>
+<div class="sec"><span class="k">How XP works</span></div><p class="mu" style="max-width:640px">Skills: Learning 15, Practising 40, Completed 100. Projects: 250. Each tracker entry: 30. Each daily quest: 20. Ranks run E, D, C, B, A, S.</p>
+<div class="sec"><span class="k">Your data</span><span class="k">Backup · move between devices</span></div>
+<p class="mu" style="max-width:640px">Progress is stored only in this browser. Press Export, copy the text, then paste it on another device and press Import twice to confirm.</p>
+<textarea id="bk" class="bk" spellcheck="false" placeholder="Export fills this box. To restore, paste a backup here."></textarea>
+<div class="fm"><button class="btn" onclick="ex()">Export</button><button class="btn" onclick="im()">Import</button><span id="bkm" class="k" style="align-self:center"></span></div>`}
 function head(){const h=location.hash.slice(1)||'home';
-$('#hd').innerHTML=`<a class="logo" href="#home"><span class="sq"></span>Solo Levelling</a><nav>${[['home','Overview'],['projects','Projects'],['timeline','Timeline'],['trackers','Trackers']].map(([k,l])=>`<a href="#${k}" class="${h==k?'on':''}">${l}</a>`).join('')}<i></i>${K.map((k,i)=>`<a class="d ${h==k?'on':''}" href="#${k}" title="${B[k][0]}">0${i+1}</a>`).join('')}</nav><div class="ovp"><span>${pct(N)}%</span><div class="bar"><i style="width:${pct(N)}%"></i></div></div>`}
+$('#hd').innerHTML=`<a class="logo" href="#home"><span class="sq"></span>Solo Levelling</a><nav>${[['home','Overview'],['today','Today'],['projects','Projects'],['timeline','Timeline'],['trackers','Trackers']].map(([k,l])=>`<a href="#${k}" class="${h==k?'on':''}">${l}</a>`).join('')}<i></i>${K.map((k,i)=>`<a class="d ${h==k?'on':''}" href="#${k}" title="${B[k][0]}">0${i+1}</a>`).join('')}</nav><div class="ovp"><span>${rank().r} · ${pct(N)}%</span><div class="bar"><i style="width:${pct(N)}%"></i></div></div>`}
 function geo(){const h=[...Array(6)].map((_,i)=>{const a=Math.PI/3*i-Math.PI/2;return[(200+150*Math.cos(a)).toFixed(1),(200+150*Math.sin(a)).toFixed(1)]});
 return`<svg class="g" viewBox="0 0 400 400" aria-hidden="true"><g class="spin"><rect x="80" y="80" width="240" height="240" pathLength="1"/></g><g class="spin r"><rect x="115" y="115" width="170" height="170" pathLength="1" style="animation-delay:.3s"/></g><rect x="155" y="155" width="90" height="90" pathLength="1" style="animation-delay:.6s"/><polygon points="${h.map(p=>p.join(',')).join(' ')}" pathLength="1" style="animation-delay:1.4s"/>${h.map(([x,y],i)=>`<line x1="200" y1="200" x2="${x}" y2="${y}" pathLength="1" style="animation-delay:${.8+i*.12}s"/><circle class="dot" cx="${x}" cy="${y}" r="3" style="--i:${i}"/>`).join('')}</svg>`}
 function home(m){const nx=nxt()[0];
-m.innerHTML=`<section class="hero"><div class="rv"><div class="eyebrow">Solo Levelling</div><h1>Build Your Own<br>Advantage.</h1><p class="sub">A structured journey from Industrial Engineering to Business Intelligence, AI Automation, Quantitative Finance and Entrepreneurship.</p><a class="btn pri" href="#an">Open roadmap</a><a class="btn" href="#timeline">View timeline</a></div><div class="rv" style="--i:2">${geo()}</div></section>
+m.innerHTML=`<section class="hero"><div class="rv"><div class="eyebrow">Solo Levelling</div><h1>Build Your Own<br>Advantage.</h1><p class="sub">A structured journey from Industrial Engineering to Business Intelligence, AI Automation, Quantitative Finance and Entrepreneurship.</p><a class="btn pri" href="#an">Open roadmap</a><a class="btn" href="#today">Today</a><a class="btn" href="#timeline">View timeline</a></div><div class="rv" style="--i:2">${geo()}</div></section>
 <section class="stats rv" style="--i:3"><div><span class="k">Overall progress</span><b>${pct(N)}%</b></div><div><span class="k">Skills completed</span><b>${dn(N)} / ${N.length}</b></div><div>${nx?`<a href="#${nx.b}" onclick="sel='${nx.id}'"><span class="k">Recommended next</span><b>${nx.n} →</b></a>`:'<span class="k">Recommended next</span><b>All complete</b>'}</div></section>
 <div class="sec"><span class="k">Six domains</span><span class="k">Select to open</span></div>
 <div class="grid6">${K.map((k,i)=>{const l=N.filter(n=>n.b==k);return`<a class="cell rv" style="--c:${B[k][1]};--i:${i}" href="#${k}"><span class="no">0${i+1}</span><h3>${B[k][0]}</h3><p>${l.slice(0,3).map(n=>n.n.split(' (')[0]).join(' · ')}</p><div class="bar"><i style="width:${pct(l)}%"></i></div><div class="meta"><span>${dn(l)}/${l.length} skills · ${pct(l)}%</span><span class="arrow">→</span></div></a>`}).join('')}</div>
@@ -221,7 +247,7 @@ function rm(k,i){LG[k].splice(i,1);sv();route(1)}
 function route(still){const op=[...document.querySelectorAll('details[id][open]')].map(e=>e.id);$('#m').style.removeProperty('--c');window.stillFlag=!!still;const y=scrollY,h=location.hash.slice(1)||'home';
 if(!still&&sel&&byId[sel].b!=h)sel=null;
 document.body.classList.toggle('still',!!still);head();const m=$('#m');
-(K.includes(h)?m=>dom(m,h):{home,projects,timeline,trackers}[h]||home)(m);
+(K.includes(h)?m=>dom(m,h):{home,today,projects,timeline,trackers}[h]||home)(m);
 if(still){document.querySelectorAll('details[id]').forEach(e=>e.open=op.includes(e.id)||e.id=='d-'+sel);scrollTo(0,y)}else if(!sel)scrollTo(0,0)}
 addEventListener('hashchange',()=>route());addEventListener('resize',()=>{const h=location.hash.slice(1);K.includes(h)&&lines(h)});
 addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.fm input'))e.target.closest('.fm').querySelector('.btn').click()});
